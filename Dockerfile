@@ -1,4 +1,5 @@
 FROM php:7.1-apache
+MAINTAINER John S. Lutz <jlutz@broadiq.com>
 
 # System Dependencies.
 RUN apt-get update && apt-get install -y \

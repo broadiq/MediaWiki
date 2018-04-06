@@ -1,4 +1,11 @@
-What is MediaWiki?
-MediaWiki is free and open-source wiki software. Originally developed by Magnus Manske and improved by Lee Daniel Crocker, it runs on many websites, including Wikipedia, Wiktionary and Wikimedia Commons. It is written in the PHP programming language and stores the contents into a database. Like WordPress, which is based on a similar licensing and architecture, it has become the dominant software in its category.
+# What is MediaWiki?
 
-wikipedia.org/wiki/MediaWiki
+MediaWiki is a free and open-source wiki app, used to power wiki websites such
+as Wikipedia, Wiktionary and Commons, developed by the Wikimedia Foundation and
+others.
+
+> [wikipedia.org/wiki/MediaWiki](https://en.wikipedia.org/wiki/MediaWiki)
+
+#How to use this image
+
+This image is meant to be used with [BroadIQ](https://www.broadiq.com).  Please go to BroadIQ and create an account if you don't have one.  Then you can use BroadIQ's tools to deploy the image.
