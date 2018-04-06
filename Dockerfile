@@ -45,3 +45,5 @@ RUN curl -fSL "https://releases.wikimedia.org/mediawiki/${MEDIAWIKI_MAJOR_VERSIO
     && tar -xz --strip-components=1 -f mediawiki.tar.gz \
     && rm mediawiki.tar.gz \
     && chown -R www-data:www-data extensions skins cache images
+
+COPY LocalSettings.php /var/www/html/LocalSettings.php
