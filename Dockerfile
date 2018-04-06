@@ -1,52 +1,46 @@
-FROM php:5.6-apache
-MAINTAINER John S. Lutz <jlutz@broadiq.com>
+FROM php:7.1-apache
 
-ENV MEDIAWIKI_VERSION 1.24
-ENV MEDIAWIKI_FULL_VERSION 1.24.2
-
-RUN set -x; \
-    apt-get update \
-    && apt-get install -y --no-install-recommends \
-        g++ \
-        libicu52 \
+# System Dependencies.
+RUN apt-get update && apt-get install -y \
+        git \
+        imagemagick \
         libicu-dev \
-    && pecl install intl \
-    && echo extension=intl.so >> /usr/local/etc/php/conf.d/ext-intl.ini \
-    && apt-get purge -y --auto-remove g++ libicu-dev \
-    && rm -rf /var/lib/apt/lists/*
+        # Required for SyntaxHighlighting
+        python \
+    --no-install-recommends && rm -r /var/lib/apt/lists/*
 
-RUN docker-php-ext-install mysqli opcache
+# Install the PHP extensions we need
+RUN docker-php-ext-install mbstring mysqli opcache intl
 
-RUN set -x; \
-    apt-get update \
-    && apt-get install -y --no-install-recommends imagemagick \
-    && rm -rf /var/lib/apt/lists/*
+# Install the default object cache.
+RUN pecl channel-update pecl.php.net \
+    && pecl install apcu-5.1.8 \
+    && docker-php-ext-enable apcu
 
-RUN a2enmod rewrite
+# set recommended PHP.ini settings
+# see https://secure.php.net/manual/en/opcache.installation.php
+RUN { \
+        echo 'opcache.memory_consumption=128'; \
+        echo 'opcache.interned_strings_buffer=8'; \
+        echo 'opcache.max_accelerated_files=4000'; \
+        echo 'opcache.revalidate_freq=60'; \
+        echo 'opcache.fast_shutdown=1'; \
+        echo 'opcache.enable_cli=1'; \
+    } > /usr/local/etc/php/conf.d/opcache-recommended.ini
 
-# https://www.mediawiki.org/keys/keys.txt
-RUN gpg --keyserver pool.sks-keyservers.net --recv-keys \
-    441276E9CCD15F44F6D97D18C119E1A64D70938E \
-    41B2ABE817ADD3E52BDA946F72BC1C5D23107F8A \
-    162432D9E81C1C618B301EECEE1F663462D84F01 \
-    1D98867E82982C8FE0ABC25F9B69B3109D3BB7B0 \
-    3CEF8262806D3F0B6BA1DBDD7956EE477F901A30 \
-    280DB7845A1DCAC92BB5A00A946B02565DC00AA7
+# SQLite Directory Setup
+RUN mkdir -p /var/www/data \
+    && chown -R www-data:www-data /var/www/data
 
-RUN MEDIAWIKI_DOWNLOAD_URL="https://releases.wikimedia.org/mediawiki/$MEDIAWIKI_VERSION/mediawiki-$MEDIAWIKI_FULL_VERSION.tar.gz"; \
-    set -x; \
-    mkdir -p /usr/src/mediawiki \
-    && curl -fSL "$MEDIAWIKI_DOWNLOAD_URL" -o mediawiki.tar.gz \
-    && curl -fSL "${MEDIAWIKI_DOWNLOAD_URL}.sig" -o mediawiki.tar.gz.sig \
-    && gpg --verify mediawiki.tar.gz.sig \
-    && tar -xf mediawiki.tar.gz -C /usr/src/mediawiki --strip-components=1
+# Version
+ENV MEDIAWIKI_MAJOR_VERSION 1.30
+ENV MEDIAWIKI_BRANCH REL1_30
+ENV MEDIAWIKI_VERSION 1.30.0
+ENV MEDIAWIKI_SHA512 ec4aeb08c18af0e52aaf99124d43cd357328221934d593d87f38da804a2f4a5b172a114659f87f6de58c2140ee05ae14ec6a270574f655e7780a950a51178643
 
-
-COPY apache/mediawiki.conf /etc/apache2/
-RUN echo Include /etc/apache2/mediawiki.conf >> /etc/apache2/apache2.conf
-
-COPY LocalSettings.php /LocalSettings.php
-
-COPY docker-entrypoint.sh /entrypoint.sh
-ENTRYPOINT ["/entrypoint.sh"]
-CMD ["apache2-foreground"]
+# MediaWiki setup
+RUN curl -fSL "https://releases.wikimedia.org/mediawiki/${MEDIAWIKI_MAJOR_VERSION}/mediawiki-${MEDIAWIKI_VERSION}.tar.gz" -o mediawiki.tar.gz \
+    && echo "${MEDIAWIKI_SHA512} *mediawiki.tar.gz" | sha512sum -c - \
+    && tar -xz --strip-components=1 -f mediawiki.tar.gz \
+    && rm mediawiki.tar.gz \
+    && chown -R www-data:www-data extensions skins cache images
