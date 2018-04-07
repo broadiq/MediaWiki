@@ -151,5 +151,5 @@ wfLoadExtension( 'WikiEditor' );
 # End of automatically generated settings.
 # Add more configuration options below.
 
-ession_save_path("tmp");
+session_save_path("tmp");
 $wgCookieSecure = false;
