@@ -68,6 +68,7 @@ $wgDBmysql5 = false;
 
 ## Shared memory settings
 $wgMainCacheType = CACHE_ACCEL;
+$wgSessionCacheType = CACHE_DB;
 $wgMemCachedServers = [];
 
 ## To enable image uploads, make sure the 'images' directory
@@ -150,4 +151,5 @@ wfLoadExtension( 'WikiEditor' );
 # End of automatically generated settings.
 # Add more configuration options below.
 
-
+ession_save_path("tmp");
+$wgCookieSecure = false;

@@ -47,3 +47,7 @@ RUN curl -fSL "https://releases.wikimedia.org/mediawiki/${MEDIAWIKI_MAJOR_VERSIO
     && chown -R www-data:www-data extensions skins cache images
 
 COPY LocalSettings.php /var/www/html/LocalSettings.php
+
+RUN mkdir -p /var/www/html/tmp && chmod -R 777 /var/www/html/tmp
+
+
