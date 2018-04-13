@@ -1,6 +1,5 @@
 -- MySQL dump 10.13  Distrib 5.7.17, for macos10.12 (x86_64)
 --
--- Host: a3e3868e839df11e8a0ac02842eec4d7-405607305.us-east-2.elb.amazonaws.com    Database: test_db
 -- ------------------------------------------------------
 -- Server version	5.7.21
 
